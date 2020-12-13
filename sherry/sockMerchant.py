@@ -11,12 +11,12 @@ def sockMerchant(n, ar):
  #   ar_list = ar.split()
     color_list = []
     total_cnt = 0
-    for i in range(0,n-1):
+    for i in range(0,n):
         pair = ar[i]
         if pair not in color_list:
             color_list.append(pair)
             cnt = 1
-            for j in range(i+1,n-1):
+            for j in range(i+1,n):
                 if pair == ar[j]:
                     cnt += 1
             total_cnt += int(cnt/2)
