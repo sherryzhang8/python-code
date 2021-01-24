@@ -1,11 +1,11 @@
-from slack.airflow.dags import SlackDAG
-from slack.airflow.operators.livy_operators import LivyPySparkOperator
-from slack.airflow.operators.sensors.retryable_sensors import RetryableExternalTaskSensor
-from slack.airflow.operators.landing_framework.landing_framework_execution_operators import LandingFrameworkHiveOperator, LandingFrameworkPrestoOperator, LandingFrameworkVersionExpiryOperator
-from slack.airflow.operators.landing_framework.landing_framework_metadata_operators import LandingFrameworkMetadataOperator
-from slack.airflow.operators.landing_framework.config import LandingFrameworkConfig
-from slack.airflow.operators.landing_framework.configuration_utils import read_yaml_configuration, get_dependency_task
-from slack.airflow.operators.landing_framework.util import get_files_in_directory
+from airflow.dags import DAG
+from airflow.operators.livy_operators import LivyPySparkOperator
+from airflow.operators.sensors.retryable_sensors import RetryableExternalTaskSensor
+from airflow.operators.landing_framework.landing_framework_execution_operators import LandingFrameworkHiveOperator, LandingFrameworkPrestoOperator, LandingFrameworkVersionExpiryOperator
+from airflow.operators.landing_framework.landing_framework_metadata_operators import LandingFrameworkMetadataOperator
+from airflow.operators.landing_framework.config import LandingFrameworkConfig
+from airflow.operators.landing_framework.configuration_utils import read_yaml_configuration, get_dependency_task
+from airflow.operators.landing_framework.util import get_files_in_directory
 from airflow.operators.dummy_operator import DummyOperator
 from datetime import timedelta
 import os
@@ -40,7 +40,7 @@ def generate_backfill_landing_dag(dag_name, configuration_metadata):
     # Populate default arguments with any overrides from configuration metadata
     # TODO: Add ability to override
     default_args = {
-        'owner': '#team-dma',
+        'owner': '#team',
         'depends_on_past': True,
         'wait_for_downstream': True,
         'start_date': configuration_metadata['backfill_date'],
@@ -50,7 +50,7 @@ def generate_backfill_landing_dag(dag_name, configuration_metadata):
         'retries': 1,
         'retry_delay': timedelta(minutes=5),
         'params': {
-            'cluster': 'dev-analytics'
+            'cluster': 'dev'
         },
         # 'queue': 'bash_queue',
         # 'pool': 'backfill',
@@ -58,7 +58,7 @@ def generate_backfill_landing_dag(dag_name, configuration_metadata):
         # 'end_date': datetime(2016, 1, 1),
     }
 
-    dag = SlackDAG(name=dag_name, default_args=default_args, schedule_interval='@once',
+    dag = DAG(name=dag_name, default_args=default_args, schedule_interval='@once',
                    max_active_runs=1)
 
     # Extract metadata from the source, and pass into XCOM for further tasks to use to dynamically
@@ -125,7 +125,7 @@ def generate_landing_dag(dag_name, configuration_metadata):
     # Populate default arguments with any overrides from configuration metadata
     # TODO: Add ability to override
     default_args = {
-        'owner': '#team-dma',
+        'owner': '#team',
         'depends_on_past': True,
         'wait_for_downstream': True,
         'start_date': configuration_metadata['start_date'],
@@ -135,7 +135,7 @@ def generate_landing_dag(dag_name, configuration_metadata):
         'retries': 1,
         'retry_delay': timedelta(minutes=5),
         'params': {
-            'cluster': 'dev-analytics'
+            'cluster': 'dev'
         },
         # 'queue': 'bash_queue',
         # 'pool': 'backfill',
@@ -153,7 +153,7 @@ def generate_landing_dag(dag_name, configuration_metadata):
         )
 
     # Main DAG definition
-    dag = SlackDAG(name=dag_name, default_args=default_args, schedule_interval=schedule_interval,
+    dag = DAG(name=dag_name, default_args=default_args, schedule_interval=schedule_interval,
                    max_active_runs=1)
 
     # Check and wait for the complete previous run to have completed
