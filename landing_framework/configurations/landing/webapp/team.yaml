@@ -1,0 +1,45 @@
+version: 2
+module_type: landing
+enabled: true
+interface_type: s3
+cdc_type: full_snapshot
+source_name: webapp
+table_name: teams
+#backfill_date: "2019-07-01"
+start_date: "2019-07-10"
+hive_buckets: 128
+schedule_interval: daily
+unique_columns:
+  - id
+exclude_columns:
+  - etl_snapshot_date
+  - db_shard
+  - ms_shard
+  - ds_shard
+  - redis_shard
+  - solr_shard
+  - solr_shard_2
+  - solr_files_shard
+  - solr_files_shard_2
+  - solr_users_shard
+  - solr_users_shard_2
+  - db_shard_lock
+  - ms_shard_lock
+  - ds_shard_lock
+  - redis_shard_lock
+  - solr_shard_lock
+dependencies:
+  - type: legacy
+    options:
+      name: sqooper_v
+module_options:
+  source_s3_bucket: dw
+  source_s3_base_path:
+    "2016-04-27": "/dw/snapshots/t/"
+    "2018-04-23": "/dw/snapshots/v/"
+  source_s3_date_format: "%Y/%m/%d"
+  source_s3_file_format: parquet
+  source_partitions:
+    - column_name: etl_shard_id
+      data_type: int
+
